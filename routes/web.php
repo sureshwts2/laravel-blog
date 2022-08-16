@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashbordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\WelcomeController;
@@ -24,10 +25,25 @@ Auth::routes();
 Route::get('/',[WelcomeController::class,'index'])->name('welcome');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Route::post('/post/store',[PostController::class,'store'])->name('post.store');
 Route::get('/post/show/{postId}',[PostController::class,'show'])->name('post.show');
-Route::get('/post/all',[HomeController::class,'allPosts'])->name('post.all');
-Route::get('/post/{postId}/edit',[PostController::class,'edit'])->name('post.edit');
-Route::post('/post/{postId}/update',[PostController::class,'update'])->name('post.update');
-Route::get('/post/{postId}/delete',[PostController::class,'delete'])->name('post.delete');
+
+
+Route::group(['middleware'=>'auth'],function(){
+    Route::post('/post/store',[PostController::class,'store'])->name('post.store');
+
+    Route::get('/post/all',[HomeController::class,'allPosts'])->name('post.all');
+    Route::get('/post/{postId}/edit',[PostController::class,'edit'])->name('post.edit');
+    Route::post('/post/{postId}/update',[PostController::class,'update'])->name('post.update');
+    Route::get('/post/{postId}/delete',[PostController::class,'delete'])->name('post.delete');
+
+});
+
+
+
+//admin routes
+Route::group(['middleware'=>'admin','auth', 'prefix'=>'admin','as'=>'admin.'],function(){
+    Route::get('dashboard',[DashbordController::class,'index'])->middleware('admin')->name('dashboard');
+});
+
+
+
